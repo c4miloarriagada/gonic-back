@@ -1,18 +1,32 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 
-var Router *gin.Engine
+	"go-gin-api/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+)
 
 func main() {
-	Router = gin.Default()
-	api := Router.Group("/api")
-	{
-		api.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(200, gin.H{
-				"message": "test successful",
-			})
-		})
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
-	Router.Run(":5000")
+
+	r := gin.Default()
+	models.ConnectDatabase()
+	r.LoadHTMLGlob("./public/*")
+
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
+	port := os.Getenv("PORT")
+	fmt.Println("**** Starting server at port", os.Getenv("PORT"), "****")
+	r.Run(":" + port)
 }
