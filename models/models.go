@@ -64,7 +64,6 @@ func ConnectDatabase() {
 	if err != nil {
 		return
 	}
-	db.AutoMigrate(&Account{})
 
 	fmt.Println("*******DB READY*******")
 
