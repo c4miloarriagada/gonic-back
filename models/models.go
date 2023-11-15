@@ -12,11 +12,31 @@ import (
 )
 
 type User struct {
-	Id        int       `json:"id" gorm:"primaryKey"`
+	UserID    int       `json:"id" gorm:"primaryKey"`
 	Name      string    `json:"name"`
 	LastName  string    `json:"lastname"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Account struct {
+	AccountID int     `json:"id" gorm:"primaryKey"`
+	UserID    int     `json:"userid" gorm:"foreignKey:UserRefer"`
+	Balance   float64 `json:"balance"`
+}
+
+type Transactions struct {
+	TrasnctionID int       `json:"id" gorm:"primaryKey"`
+	AccountID    int       `json:"accountid" gorm:"foreignKey:AccountRefer"`
+	TimeStamp    time.Time `json:"timestamp"`
+	Descriptions string    `json:"descriptions"`
+	Total        float64   `json:"total"`
+	Type         int       `json:"typeid" gorm:"foreignKey:"`
+}
+
+type Type struct {
+	TypeID int    `json:"id" gorm:"primaryKey"`
+	Type   string `json:"type" `
 }
 
 var DB *gorm.DB
@@ -36,12 +56,15 @@ func ConnectDatabase() {
 		panic("Failed to connect to database!")
 	}
 
-	db.Migrator().DropTable(&User{})
+	var models = []interface{}{&User{}, &Account{}, &Transactions{}, &Type{}}
 
-	err = db.AutoMigrate(&User{})
+	db.Migrator().DropTable(models...)
+
+	err = db.AutoMigrate(models...)
 	if err != nil {
 		return
 	}
+	db.AutoMigrate(&Account{})
 
 	fmt.Println("*******DB READY*******")
 
