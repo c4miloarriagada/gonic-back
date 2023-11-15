@@ -2,7 +2,10 @@ module go-gin-api
 
 go 1.21.3
 
-require gorm.io/driver/postgres v1.5.4
+require (
+	github.com/BurntSushi/toml v1.3.2
+	gorm.io/driver/postgres v1.5.4
+)
 
 require (
 	github.com/kr/text v0.2.0 // indirect

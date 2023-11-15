@@ -6,13 +6,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	UserID    int       `json:"id" gorm:"primaryKey"`
+	UserID    int       `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name      string    `json:"name"`
 	LastName  string    `json:"lastname"`
 	Email     string    `json:"email"`
@@ -20,13 +21,13 @@ type User struct {
 }
 
 type Account struct {
-	AccountID int     `json:"id" gorm:"primaryKey"`
+	AccountID int     `json:"id" gorm:"primaryKey;autoIncrement"`
 	UserID    int     `json:"userid" gorm:"foreignKey:UserRefer"`
 	Balance   float64 `json:"balance"`
 }
 
 type Transactions struct {
-	TrasnctionID int       `json:"id" gorm:"primaryKey"`
+	TrasnctionID int       `json:"id" gorm:"primaryKey;autoIncrement"`
 	AccountID    int       `json:"accountid" gorm:"foreignKey:AccountRefer"`
 	TimeStamp    time.Time `json:"timestamp"`
 	Descriptions string    `json:"descriptions"`
@@ -35,8 +36,12 @@ type Transactions struct {
 }
 
 type Type struct {
-	TypeID int    `json:"id" gorm:"primaryKey"`
+	TypeID int    `json:"id" gorm:"primaryKey;autoIncrement"`
 	Type   string `json:"type" `
+}
+
+type UserFile struct {
+	Users []User
 }
 
 var DB *gorm.DB
@@ -63,6 +68,15 @@ func ConnectDatabase() {
 	err = db.AutoMigrate(models...)
 	if err != nil {
 		return
+	}
+
+	var usersFile UserFile
+	if _, err := toml.DecodeFile("./data/users.toml", &usersFile); err != nil {
+		panic("Error when trying to read the doc")
+	}
+
+	for _, user := range usersFile.Users {
+		db.Create(&user)
 	}
 
 	fmt.Println("*******DB READY*******")

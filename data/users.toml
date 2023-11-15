@@ -1,0 +1,12 @@
+
+[[users]]
+name = "John"
+lastname = "Doe"
+email = "john@example.com"
+created_at = "2023-01-01T12:00:00Z"
+
+[[users]]
+name = "Jane"
+lastname = "Doe"
+email = "jane@example.com"
+created_at = "2023-01-02T15:30:00Z"
