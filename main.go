@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"go-gin-api/controllers"
+	"go-gin-api/auth"
 	"go-gin-api/models"
+	"go-gin-api/router"
 	"log"
 	"net/http"
 	"os"
@@ -22,14 +22,16 @@ func main() {
 
 	models.ConnectDatabase()
 
-	r.LoadHTMLGlob("./public/*")
-
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
-	})
-	r.GET("/users", controllers.GetUsers)
+	auth, err := auth.New()
+	if err != nil {
+		log.Fatalf("Failed to initialize the authenticator: %v", err)
+	}
+	rtr := router.New(auth)
 
 	port := os.Getenv("PORT")
-	fmt.Println("**** Starting server at port", os.Getenv("PORT"), "****")
+	if err := http.ListenAndServe("0.0.0.0:"+port, rtr); err != nil {
+		log.Fatalf("There was an error with the http server: %v", err)
+	}
+
 	r.Run(":" + port)
 }

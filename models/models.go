@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -79,7 +78,7 @@ func ConnectDatabase() {
 		db.Create(&user)
 	}
 
-	fmt.Println("*******DB READY*******")
+	log.Print("*******DB READY*******")
 
 	DB = db
 }
